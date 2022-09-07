@@ -15,7 +15,8 @@
                     <!-- Configuring the path to the key store -->
                     <path>hivemq.jks</path>
                     <!-- The password of the key store -->
-                    <password>neverchangeme</password>
+                    <password>betterChangeMe</password>
+                    <private-key-password>betterChangeMe</private-key-password>
                     <client-authentication-mode>NONE</client-authentication-mode>
                 </keystore>
             </tls>
