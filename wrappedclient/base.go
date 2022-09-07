@@ -4,14 +4,14 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"math"
+	"os"
 	"time"
-)
 
-import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
@@ -93,12 +93,13 @@ func (clientData *ClientData) createClient() *mqtt.Client {
 	return &client
 }
 
-func (clientData *ClientData) CreateClientDefaultPublish(topic, tag_name string) {
+func (clientData ClientData) CreateClientDefaultPublish(topic, tag_name string) {
+	fmt.Println("CreateClientDefaultPublish")
 	client := clientData.createClient()
 	publish(client, topic, tag_name)
 }
 
-func (clientData *ClientData) createClientDefaultSub(topic string) {
+func (clientData ClientData) createClientDefaultSub(topic string) {
 	client := clientData.createClient()
 	sub(client, topic)
 }
@@ -141,14 +142,6 @@ func publish(client *mqtt.Client, topic string, tag_name string) {
 		a = 7.0
 		b = 1.3
 		d = 0.1
-	case "wetter":
-		a = 5.0
-		b = 0.5
-		d = -2.0
-	case "sonne":
-		a = -1.0
-		b = -8.5
-		d = 1.0
 	}
 
 	for range time.Tick(time.Duration(1) * time.Second) {
@@ -158,14 +151,31 @@ func publish(client *mqtt.Client, topic string, tag_name string) {
 	}
 }
 
+func fileExist(filename string) bool {
+	ret := true
+	if _, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
+		ret = false
+	}
+	return ret
+}
+
+func fileNotExistWarning(filename string) {
+	if !fileExist(filename) {
+		fmt.Printf("Not found file: %s\n", filename)
+	}
+
+}
+
 func CreateDefaultClientData(connectionType string, port int, idx int, sslEnable bool) *ClientData {
 	brokerUrl := "localhost"
 	clientId := fmt.Sprintf("client-id-%d", idx)
 	clientCert := fmt.Sprintf("certs/client%d/client.pem", idx)
 	clientKey := fmt.Sprintf("certs/client%d/client.key", idx)
-	serverCert := fmt.Sprintf("certs/server/server.pem", idx)
-	userName := fmt.Sprintf("user_name_to_change%d", idx)
-	passWord := "pa$$w0rd2changeme"
+	serverCert := "certs/server/hivemq-server-cert.pem"
+
+	fileNotExistWarning(clientCert)
+	fileNotExistWarning(clientKey)
+	fileNotExistWarning(serverCert)
 
 	return &ClientData{
 		ClientCert:     clientCert,
@@ -174,8 +184,6 @@ func CreateDefaultClientData(connectionType string, port int, idx int, sslEnable
 		SslEnable:      sslEnable,
 		Url:            brokerUrl,
 		Port:           port,
-		UserName:       userName,
-		PassWord:       passWord,
 		ConnectionType: connectionType,
 		ClientId:       clientId,
 	}

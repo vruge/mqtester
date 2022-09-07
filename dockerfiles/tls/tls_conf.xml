@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<hivemq xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="hivemq-config.xsd">
+
+    <listeners>
+        <tls-tcp-listener>
+            <port>8883</port>å
+            <bind-address>0.0.0.0</bind-address>
+            <name>my-secure-tcp-listener</name>
+            <tls>
+                <protocols>
+                    <protocol>TLSv1.3</protocol>
+                </protocols>
+                <keystore>
+                    <!-- Configuring the path to the key store -->
+                    <path>hivemq.jks</path>
+                    <!-- The password of the key store -->
+                    <password>neverchangeme</password>
+                    <client-authentication-mode>NONE</client-authentication-mode>
+                </keystore>
+            </tls>
+        </tls-tcp-listener>
+    </listeners>
+    <!--REST-API-CONFIGURATION-->
+
+    <control-center>
+        <listeners>
+            <http>
+                <port>8080</port>
+                <bind-address>0.0.0.0</bind-address>
+            </http>
+        </listeners>
+    </control-center>
+</hivemq>
